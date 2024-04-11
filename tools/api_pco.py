@@ -11,7 +11,16 @@ class PCOContext:
         self.auth = (self.app_id, self.secret)
         self.verify = True
 
-def services_get_all_people(context: PCOContext):
+def services_get_all_people(context: PCOContext) -> list:
+    """
+    Retrieves all people from the Planning Center Services API.
+
+    Args:
+        context (PCOContext): The PCOContext object containing the base URL, authentication, and verification settings.
+
+    Returns:
+        list: A list of dictionaries containing the response data for each page of people.
+    """
     link = context.base_url + '/services/v2/people?order=last_name&per_page=100&offset=0'
 
     data = []
@@ -28,8 +37,19 @@ def services_get_all_people(context: PCOContext):
     return data
 
 def services_add_blockout(context: PCOContext, person_id:str, start_time:str, end_time:str, reason:str):
-    # https://developer.planning.center/docs/#/apps/services/2018-11-01/vertices/blockout
-    # https://developer.planning.center/docs/#/apps/services/2018-11-01/vertices/blockout_date
+    """
+    Adds a blockout for a person in the Planning Center Services API.
+
+    Args:
+        context (PCOContext): The PCOContext object containing the base URL, authentication, and verification settings.
+        person_id (str): The ID of the person for whom the blockout is being added.
+        start_time (str): The start time of the blockout in ISO 8601 format.
+        end_time (str): The end time of the blockout in ISO 8601 format.
+        reason (str): The reason for the blockout.
+
+    Returns:
+        None
+    """
     link = context.base_url + f'/services/v2/people/{person_id}/blockouts'
     data = {
         "data": {
@@ -48,7 +68,6 @@ def services_add_blockout(context: PCOContext, person_id:str, start_time:str, en
     else:
         print(f'Error adding blockout for {person_id}')
         print(response.text)
-    return
 
 def main():
     context = pick_context()
