@@ -1,6 +1,6 @@
-from pathlib import Path
 import json
 import csv
+from glob import glob
 
 def grab_all_contexts() -> dict:
     """
@@ -10,7 +10,7 @@ def grab_all_contexts() -> dict:
         dict: A dictionary containing the contexts, where the keys are the file names and the values are the context contents.
     """
     contexts = {}
-    for cxt in Path('context/*.cxt'):
+    for cxt in glob('context/*.cxt'):
         with open(cxt, 'r') as json_file:
             context = json.load(json_file)
         file_name = cxt.split('/')[-1].split('.')[0]
@@ -48,7 +48,9 @@ def get_blockout_info() -> dict:
     Returns:
         A dictionary containing the blockout information.
     """
-    return json.load(Path('input/blockouts.json').read_text())
+    with open ('input/blockouts.json', 'r') as json_file:
+        blockouts = json.load(json_file)
+    return blockouts
 
 def grab_all_names() -> dict:
     """
@@ -59,7 +61,7 @@ def grab_all_names() -> dict:
     """
     name_files = {}
     # navigate to ./names and grab each csv file
-    for name_file in Path('input/*.csv'):
+    for name_file in glob('input/*.csv'):
         with open(name_file, 'r') as csv_file:
             file = csv_file.read()
         # convert file to a dictionary
