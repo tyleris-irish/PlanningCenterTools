@@ -1,5 +1,5 @@
 from setup import pick_context, pick_names, get_blockout_info
-from api_pco import PCOContext, services_get_all_people, services_add_blockout
+from api_pco import PCOContext, services_get_all_people, services_post_blockout
 
 def find_person_and_input_blockout(pco: PCOContext, all_people, blockout_user, blockout):
     match_found = False
@@ -7,15 +7,15 @@ def find_person_and_input_blockout(pco: PCOContext, all_people, blockout_user, b
         for services_user in page['data']:
             if blockout_user['Full Name'] == services_user['attributes']['full_name']:
                 #print(f'Found a Full Name match for {missionary["Full Name"]}')
-                services_add_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
+                services_post_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
                 match_found = True
             elif blockout_user['First Name'] == services_user['attributes']['first_name'] and blockout_user['Last Name'] == services_user['attributes']['last_name']:
                 #print(f'Found a First Name and Last Name match for {missionary["Full Name"]}')
-                services_add_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
+                services_post_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
                 match_found = True
             elif blockout_user['First Name'] == services_user['attributes']['full_name'].split(' ')[0] and blockout_user['Last Name'] == services_user['attributes']['full_name'].split(' ')[-1]:
                 #print(f'Found a unique First Name and Last Name match for {missionary["Full Name"]}')
-                services_add_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
+                services_post_blockout(pco, services_user['id'], blockout['starts_at'], blockout['ends_at'], blockout['reason'])
                 match_found = True
             if match_found:
                 break
