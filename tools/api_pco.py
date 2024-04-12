@@ -96,7 +96,7 @@ def services_get_recent_plans(context: PCOContext):
     
     return response.json()
 
-def services_get_team_members_of_plan(context: PCOContext, service_type_id:str, plan_id:str):
+def services_get_team_members_of_plan(context: PCOContext, plan_id:str):
     """
     Retrieves all team members in a plan.
 
@@ -108,7 +108,7 @@ def services_get_team_members_of_plan(context: PCOContext, service_type_id:str, 
     Returns:
         list: A list of dictionaries containing the response data for each page of team members.
     """
-    link = context.base_url + f'/services/v2/service_types/{service_type_id}/plans/{plan_id}/team_members'
+    link = context.base_url + f'/services/v2/service_types/{context.service}/plans/{plan_id}/team_members'
 
     data = []
     while True:
@@ -148,7 +148,7 @@ def main():
 
     # test getting team members of a plan
     plan_id = plans['data'][0]['id']
-    team_members = services_get_team_members_of_plan(pco, context['service_id'], plan_id)
+    team_members = services_get_team_members_of_plan(pco, plan_id)
     filename = 'output/' + '{:%Y%m%d-%H%M%S}'.format(datetime.datetime.now()) + '-team-members-dump.json'
     with open(filename, 'w') as json_file:
         json_file.write(json.dumps(team_members, indent=4, sort_keys=True))
