@@ -38,7 +38,7 @@ def main():
     context = pick_context()
     names = pick_names()
     blockouts = get_blockout_info()
-    pco = PCOContext(context['application_id'], context['secret'], context['organization_id'])
+    pco = PCOContext(context['application_id'], context['secret'])
     all_people = services_get_all_people(pco)
 
     for blockout_user in names:
