@@ -4,7 +4,7 @@ import datetime
 from setup import pick_context
 
 class PCOContext:
-    def __init__(self, app_id, secret, service_id):
+    def __init__(self, app_id = None, secret = None, service_id = None):
         self.base_url = 'https://api.planningcenteronline.com'
         self.app_id = app_id
         self.secret = secret

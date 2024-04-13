@@ -1,5 +1,6 @@
+from datetime import datetime
 from setup import pick_context, pick_names, get_blockout_info
-from api_pco import PCOContext, services_get_all_people, services_post_blockout
+from api_pco import PCOContext, services_get_all_people, services_post_blockout, services_get_recent_plans, services_get_team_members_of_plan
 
 def find_person_and_input_blockout(pco: PCOContext, all_people, blockout_user, blockout):
     match_found = False
@@ -24,7 +25,7 @@ def find_person_and_input_blockout(pco: PCOContext, all_people, blockout_user, b
     else:
         print(f'No match found for {blockout_user["Full Name"]}')
 
-def main():
+def add_blockout(pco: PCOContext):
     """
     Adds blockout dates for individuals in Planning Center Services based on provided names and blockout information.
     
@@ -35,7 +36,6 @@ def main():
     Returns:
         None
     """
-    context = pick_context()
     names = pick_names()
     blockouts = get_blockout_info()
     pco = PCOContext(context['application_id'], context['secret'])
@@ -50,6 +50,46 @@ def main():
             continue
 
         find_person_and_input_blockout(pco, all_people, blockout_user, blockouts[trip])
+
+def check_for_duplicates(pco: PCOContext):
+    """
+    Checks for duplicate volunteers in upcoming plans.
+
+    Retrieves application context and fetches all plans from the services. It then retrieves all volunteers for each
+    plan and checks for duplicates. Outputs a message for any duplicate volunteers found.
+
+    Returns:
+        None
+    """
+    pco = PCOContext(context['application_id'], context['secret'], context['service_id'])
+    plans = services_get_recent_plans(pco)
+    today = datetime.now()
+    print(today)
+
+    for plan in plans['data']:
+        # Check if the plan is in the future, break if the plan has passed
+        plan_date = datetime.strptime(plan['attributes']['sort_date'], '%Y-%m-%dT%H:%M:%SZ')
+
+        if plan_date < today:
+            break
+            
+        print(f"Plan: {plan['attributes']['sort_date']}")
+        all_volunteers = services_get_team_members_of_plan(pco, plan['id'])
         
+        # Check if there are duplicates in the volunteers
+        volunteers = []
+        for page in all_volunteers:
+            for volunteer in page['data']:
+                if volunteer['attributes']['name'] in volunteers:
+                    print(f'Duplicate volunteer: {volunteer['attributes']['name']}')
+                volunteers.append(volunteer['attributes']['name']) 
+
 if __name__ == '__main__':
-    main()
+    context = pick_context()
+    option = input('What would you like to do?\n1. Add blockouts\n2. Check for duplicates\n')
+    if option == '1':
+        add_blockout(context)
+    elif option == '2':
+        check_for_duplicates(context)
+    else:
+        print('Invalid option')
