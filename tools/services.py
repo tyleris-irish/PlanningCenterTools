@@ -64,7 +64,6 @@ def check_for_duplicates(pco: PCOContext):
     pco = PCOContext(context['application_id'], context['secret'], context['service_id'])
     plans = services_get_recent_plans(pco)
     today = datetime.now()
-    print(today)
 
     for plan in plans['data']:
         # Check if the plan is in the future, break if the plan has passed
@@ -84,12 +83,61 @@ def check_for_duplicates(pco: PCOContext):
                     print(f'Duplicate volunteer: {volunteer['attributes']['name']}')
                 volunteers.append(volunteer['attributes']['name']) 
 
+def check_average_volunteer_usage(pco: PCOContext):
+    """
+    Checks how often each volunteer serves in plans over a specified time period.
+
+    Retrieves application context and fetches all plans from the services. It then retrieves all volunteers for each
+    plan and checks for duplicates. Outputs a message for any duplicate volunteers found.
+
+    Returns:
+        None
+    """
+    pco = PCOContext(context['application_id'], context['secret'], context['service_id'])
+    plans = services_get_recent_plans(pco)
+    end_date = datetime.strptime(input('Enter the end date for the time period to check (YYYY-MM-DD): '), '%Y-%m-%d')
+    start_date = datetime.strptime(input('Enter the start date for the time period to check (YYYY-MM-DD): '), '%Y-%m-%d')
+
+    volunteer_count = {}
+    for plan in plans['data']:
+        # Check if the plan is within the specified time period
+        plan_date = datetime.strptime(plan['attributes']['sort_date'], '%Y-%m-%dT%H:%M:%SZ')
+        if plan_date < start_date or plan_date > end_date:
+            continue
+
+        all_volunteers = services_get_team_members_of_plan(pco, plan['id'])
+        
+        # Count the number of times each volunteer appears in the plans
+        for page in all_volunteers:
+            for volunteer in page['data']:
+                volunteer_name = volunteer['attributes']['name']
+                if volunteer_name in volunteer_count:
+                    volunteer_count[volunteer_name] += 1
+                else:
+                    volunteer_count[volunteer_name] = 1
+        
+    # Output the volunteer usage
+    print(f"Volunteer usage for plans between {start_date} and {end_date}:")
+    for volunteer, count in volunteer_count.items():
+        print(f"{volunteer}: {count} times")
+
 if __name__ == '__main__':
+    
+    print('Welcome to the Planning Center Services tool!')
+
+    print('What would you like to do?')
+    print('1. Add blockouts')
+    print('2. Check for duplicates')
+    print('3. Check average volunteer usage')
+
+    option = input('Enter the number of the option you would like to select: ')
+
     context = pick_context()
-    option = input('What would you like to do?\n1. Add blockouts\n2. Check for duplicates\n')
     if option == '1':
         add_blockout(context)
     elif option == '2':
         check_for_duplicates(context)
+    elif option == '3':
+        check_average_volunteer_usage(context)
     else:
         print('Invalid option')
