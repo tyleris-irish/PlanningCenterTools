@@ -60,6 +60,7 @@ PlanningCenterTools/
 │   └── extract.py       # Full people export (JSON + CSV)
 ├── input/               # Input CSVs and blockout JSON
 ├── output/              # Generated reports (gitignored)
+├── rotation-builder/    # Annual Sunday Teams schedule template (see its README + the wiki)
 └── pyproject.toml
 ```
 
